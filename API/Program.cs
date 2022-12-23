@@ -1,11 +1,20 @@
 using API.Contexts;
+using API.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+
+// Configure Dependency
+builder.Services.AddScoped<AccountRepositories>();
+builder.Services.AddScoped<AccountRoleRepositories>();
+builder.Services.AddScoped<EducationRepositories>();
+builder.Services.AddScoped<EmployeeRepositories>();
+builder.Services.AddScoped<ProfilingRepositories>();
+builder.Services.AddScoped<RoleRepositories>();
+builder.Services.AddScoped<UniversityRepositories>();
 
 // Configure SQL Server Databases
 builder.Services.AddDbContext<MyContext>(options => options
