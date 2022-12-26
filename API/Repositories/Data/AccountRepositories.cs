@@ -163,4 +163,11 @@ public class AccountRepositories : IRepository<Account, String>
         string NIK = empCount.NIK.Substring(1, 4);
         return Convert.ToString("x" + (Convert.ToInt32(NIK) + 1));
     }
+
+    public List<string> UserRoles(string email)
+    {
+        // {"Employee", "Manager"}
+        // {"Employee"}
+        throw new NotImplementedException();
+    }
 }
