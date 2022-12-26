@@ -3,7 +3,7 @@ using API.Contexts;
 using API.Models;
 using API.ViewModels;
 using API.Repositories.Interface;
-using Microsoft.Win32;
+using API.Handlers;
 
 namespace API.Repositories.Data;
 
@@ -82,7 +82,7 @@ public class AccountRepositories : IRepository<Account, String>
         Account account = new Account()
         {
             NIK = register.NIK,
-            Password = register.Password,
+            Password = Hashing.HashPassword(register.Password),
         };
         _accounts.Add(account);
         _context.SaveChanges();
@@ -111,6 +111,13 @@ public class AccountRepositories : IRepository<Account, String>
         _context.Profilings.Add(profiling);
         _context.SaveChanges();
 
+        _context.AccountRoles.Add(new AccountRole()
+        {
+            AccountNIK = register.NIK,
+            RoleId = 1
+        });
+        _context.SaveChanges();
+
         return 1;
     }
 
@@ -127,7 +134,7 @@ public class AccountRepositories : IRepository<Account, String>
         {
             return 0; // Email Tidak Terdaftar
         }
-        if (result.Password != login.Password)
+        if (!Hashing.ValidatePassword(login.Password, result.Password))
         {
             return 1; // Password Salah
         }
@@ -151,9 +158,9 @@ public class AccountRepositories : IRepository<Account, String>
 
         if (empCount == null)
         {
-            return "x0001";
+            return "x1111";
         }
         string NIK = empCount.NIK.Substring(1, 4);
-        return Convert.ToString("x" + Convert.ToInt32(NIK) + 1);
+        return Convert.ToString("x" + (Convert.ToInt32(NIK) + 1));
     }
 }
