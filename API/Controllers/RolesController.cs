@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using API.Models;
 using API.Repositories.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-
+[Authorize(Roles = "Admin")]
 public class RolesController : ControllerBase
 {
   private RoleRepositories _repo;

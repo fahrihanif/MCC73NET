@@ -6,75 +6,38 @@ using API.ViewModels;
 
 namespace API.Repositories.Data;
 
-public class EmployeeRepositories : IRepository<Employee, string>
+public class EmployeeRepositories : GeneralRepository<MyContext, Employee, string>
 {
-    private MyContext _context;
-    private DbSet<Employee> _employees;
-    public EmployeeRepositories(MyContext context)
+    public MyContext _context;
+    public EmployeeRepositories(MyContext context) : base(context)
     {
         _context = context;
-        _employees = context.Set<Employee>();
     }
 
     public IEnumerable<MEmployeeVM> MasterEmployee()
     {
-        var result = _employees
-                .Join(_context.Accounts, e => e.NIK, a => a.NIK, (e, a) => new { e, a })
-                .Join(_context.Profilings, ea => ea.a.NIK, p => p.NIK, (ea, p) => new { ea, p })
-                .Join(_context.Educations, eap => eap.p.EducationId, ed => ed.Id, (eap, ed) => new { eap, ed })
-                .Join(_context.Universities, eaped => eaped.ed.UniversityId, u => u.Id, (eaped, u) =>
-                new MEmployeeVM
-                {
-                    NIK = eaped.eap.ea.e.NIK,
-                    FullName = eaped.eap.ea.e.FirstName + " " + eaped.eap.ea.e.LastName,
-                    Phone = eaped.eap.ea.e.Phone,
-                    Gender = eaped.eap.ea.e.Gender.ToString(),
-                    Email = eaped.eap.ea.e.Email,
-                    BirthDate = eaped.eap.ea.e.BirthDate,
-                    Salary = eaped.eap.ea.e.Salary,
-                    EducationId = eaped.eap.p.EducationId,
-                    GPA = eaped.ed.GPA,
-                    Degree = eaped.ed.Degree,
-                    UniversityName = u.Name
-                }).ToList();
+        var results = (from e in _context.Employees
+                       join a in _context.Accounts on e.NIK equals a.NIK
+                       join ar in _context.AccountRoles on a.NIK equals ar.AccountNIK
+                       join r in _context.Roles on ar.RoleId equals r.Id
+                       join p in _context.Profilings on e.NIK equals p.NIK
+                       join edu in _context.Educations on p.EducationId equals edu.Id
+                       join u in _context.Universities on edu.UniversityId equals u.Id
+                       select new MEmployeeVM
+                       {
+                           NIK = e.NIK,
+                           FullName = e.FirstName + " " + e.LastName,
+                           Phone = e.Phone,
+                           Gender = e.Gender.ToString(),
+                           Email = e.Email,
+                           BirthDate = e.BirthDate,
+                           Salary = e.Salary,
+                           Role = _context.AccountRoles.Where(e => e.AccountNIK == p.NIK).Join(_context.Roles, ar => ar.RoleId, r => r.Id, (ar, r) => new ViewModels.Role { Name = r.Name }).ToList(),
+                           GPA = edu.GPA,
+                           Degree = edu.Degree,
+                           UniversityName = u.Name
+                       }).ToList();
 
-        return result;
-    }
-    public int Delete(string id)
-    {
-        var data = _employees.Find(id);
-        if (data == null)
-        {
-            return 0;
-        }
-
-        _employees.Remove(data);
-        var result = _context.SaveChanges();
-        return result;
-    }
-
-    public IEnumerable<Employee> Get()
-    {
-
-        return _employees.ToList();
-    }
-
-    public Employee Get(string id)
-    {
-        return _employees.Find(id);
-    }
-
-    public int Insert(Employee entity)
-    {
-        _employees.Add(entity);
-        var result = _context.SaveChanges();
-        return result;
-    }
-
-    public int Update(Employee entity)
-    {
-        _employees.Entry(entity).State = EntityState.Modified;
-        var result = _context.SaveChanges();
-        return result;
+        return results;
     }
 }

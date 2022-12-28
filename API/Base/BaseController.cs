@@ -1,40 +1,22 @@
-using Microsoft.AspNetCore.Mvc;
-using API.Models;
+﻿using API.Models;
 using API.Repositories.Data;
-using Microsoft.AspNetCore.Authorization;
+using API.Repositories.Interface;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
-namespace API.Controllers;
+namespace API.Base;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
-public class EmployeesController : ControllerBase
+public class BaseController<Repository, Entity, Key> : ControllerBase
+    where Entity : class
+    where Repository : IRepository<Entity, Key>
 {
-    private EmployeeRepositories _repo;
+    private Repository _repo;
 
-    public EmployeesController(EmployeeRepositories repo)
+    public BaseController(Repository repo)
     {
         _repo = repo;
-    }
-
-
-    [HttpGet]
-    [Route("Master")]
-    [Authorize(Roles = "Manager, Admin")]
-    public ActionResult GetMaster()
-    {
-        try
-        {
-            var result = _repo.MasterEmployee();
-            return result.Count() == 0
-            ? Ok(new { statusCode = 204, message = "Data Not Found!" })
-            : Ok(new { statusCode = 201, message = "Success", data = result });
-        }
-        catch (Exception e)
-        {
-            return BadRequest(new { statusCode = 500, message = $"Something Wrong! : {e.Message}" });
-        }
-
     }
 
     [HttpGet]
@@ -56,14 +38,14 @@ public class EmployeesController : ControllerBase
 
     [HttpGet]
     [Route("{id}")]
-    public ActionResult GetById(string id)
+    public ActionResult GetById(Key key)
     {
         try
         {
-            var result = _repo.Get(id);
+            var result = _repo.Get(key);
             return result == null
-            ? Ok(new { statusCode = 204, message = $"Data With Id {id} Not Found!" })
-            : Ok(new { statusCode = 201, message = $"Employee with NIK {id}", data = result });
+            ? Ok(new { statusCode = 204, message = $"Data With Id {key} Not Found!" })
+            : Ok(new { statusCode = 201, message = $"Data Found!", data = result });
         }
         catch (Exception e)
         {
@@ -72,11 +54,11 @@ public class EmployeesController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult Insert(Employee employee)
+    public ActionResult Insert(Entity entity)
     {
         try
         {
-            var result = _repo.Insert(employee);
+            var result = _repo.Insert(entity);
             return result == 0 ? Ok(new { statusCode = 204, message = "Data failed to Insert!" }) :
             Ok(new { statusCode = 201, message = "Data Saved Succesfully!" });
         }
@@ -87,13 +69,13 @@ public class EmployeesController : ControllerBase
     }
 
     [HttpPut]
-    public ActionResult Update(Employee employee)
+    public ActionResult Update(Entity entity)
     {
         try
         {
-            var result = _repo.Update(employee);
+            var result = _repo.Update(entity);
             return result == 0 ?
-            Ok(new { statusCode = 204, message = $"Id {employee.NIK} not found!" })
+            Ok(new { statusCode = 204, message = $"Id not found!" })
           : Ok(new { statusCode = 201, message = "Update Succesfully!" });
         }
         catch
@@ -103,13 +85,12 @@ public class EmployeesController : ControllerBase
     }
 
     [HttpDelete]
-
-    public ActionResult Delete(string id)
+    public ActionResult Delete(Key key)
     {
         try
         {
-            var result = _repo.Delete(id);
-            return result == 0 ? Ok(new { statusCode = 204, message = $"Id {id} Data Not Found" }) :
+            var result = _repo.Delete(key);
+            return result == 0 ? Ok(new { statusCode = 204, message = $"Id {key} Data Not Found" }) :
             Ok(new { statusCode = 201, message = "Data Delete Succesfully!" });
         }
         catch (Exception e)
