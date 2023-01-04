@@ -1,4 +1,5 @@
-﻿using API.Models;
+﻿using API.Controllers;
+using API.Models;
 using API.Repositories.Data;
 using API.Repositories.Interface;
 using Microsoft.AspNetCore.Http;
@@ -17,6 +18,10 @@ public class BaseController<Repository, Entity, Key> : ControllerBase
     public BaseController(Repository repo)
     {
         _repo = repo;
+    }
+
+    public BaseController(EducationsController repo)
+    {
     }
 
     [HttpGet]
