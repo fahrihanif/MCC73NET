@@ -1,0 +1,93 @@
+
+/*div{
+    width:150px;
+    height:150px;
+}
+
+.div1{
+    background-color:red;
+}
+
+.div2{
+    background-color:yellow;
+    position:absolute;
+    bottom:0;
+    right:0;
+}
+
+.div3{
+    background-color:green;
+}
+
+.container{
+    width:650px;
+    height:700px;
+    border:1px solid black;
+    position: relative;
+}*/
+
+*{
+    border: 2px solid #ddd;
+    padding:15px;
+    margin: 15px;
+}
+
+html{
+    margin:0;
+    padding:0;
+}
+
+body{
+    max-width:650px;
+    margin: 10px auto;
+}
+
+/*h1 {
+    color: pink;
+    background-color:brown;
+}*/
+
+/*calvin*/
+/* section#b.p {
+    background-color: deeppink;
+}*/
+
+/*yogi*/
+/*#b.section p {
+    background-color: purple;
+}*/
+/*p.#b {
+    background-color: purple;
+}*/
+
+/*rony*/
+/*.container #b p{
+    background-color:purple;
+}*/
+
+/*indraaaaaaaaa correct*/
+
+/*tagname=1,class=2, id=3 *//*
+div.container section#b.section2 p{
+    background-color: purple!important;
+}
+
+section#b p{
+    background-color: red;
+}
+
+section#b.section2 p{
+    background-color:blue;
+}
+
+div section#b p{
+    background-color:green!important;
+}
+
+span{
+    background-color:cyan;
+}
+
+li:nth-last-child(3):active{
+    background-color:mediumaquamarine;
+}*/
